@@ -38,14 +38,12 @@ class TodoListTest < MiniTest::Test
   end
 
   def test_shift
-    shifted = @list.shift
-    assert_equal(@todo1, shifted)
+    assert_equal(@todo1, @list.shift)
     assert_equal([@todo2, @todo3], @list.to_a)
   end
 
   def test_pop
-    popped = @list.pop
-    assert_equal(@todo3, popped)
+    assert_equal(@todo3, @list.pop)
     assert_equal([@todo1, @todo2], @list.to_a)
   end
 
@@ -53,115 +51,129 @@ class TodoListTest < MiniTest::Test
     assert_equal(false, @list.done?)
   end
 
-  def test_raise_type
-    assert_raises(TypeError) { @list.add('Hallo') }
-    assert_raises(TypeError) { @list.add(123) }
+  def test_add_to_list_with_arg
+    assert_raises(TypeError) { @list.add(1) }
+    assert_raises(TypeError) { @list.add('str') }
   end
 
   def test_shovel
-    new_to_do = ToDo.new('Shovel driveway')
-    @list << new_to_do
-    @todos << new_to_do
-
+    new_todo = ToDo.new('Walk the dog')
+    @todos << new_todo
+    @list << new_todo  
     assert_equal(@todos, @list.to_a)
   end
 
   def test_add
-    new_to_do = ToDo.new('Shovel driveway')
-    @list.add(new_to_do)
-    @todos << new_to_do
-    
+    new_todo = ToDo.new('Walk the dog')
+    @todos << new_todo
+    @list.add(new_todo)  
     assert_equal(@todos, @list.to_a)
   end
 
   def test_item_at
-    assert_raises(IndexError) { @list.item_at(100) }
-    assert_equal(@todos[1], @list.item_at(1))
+    assert_raises(IndexError) { @list.item_at(10) }
+
+    assert_equal(@todo1, @list.item_at(0))
+    assert_equal(@todo2, @list.item_at(1))
   end
 
   def test_mark_done_at
-    assert_raises(IndexError) { @list.mark_done_at(100) }
+    assert_raises(IndexError) { @list.mark_done_at(10) } 
+
     @list.mark_done_at(1)
-    assert_equal(false, @todos[0].done?)
-    assert_equal(true, @todos[1].done?)
-    assert_equal(false, @todos[2].done?)
+    assert_equal(false, @todo1.done?)
+    assert_equal(true, @todo2.done?)
+    assert_equal(false, @todo3.done?)
   end
 
   def test_mark_undone_at
-    assert_raises(IndexError) { @list.mark_undone_at(100) }
-    @list.mark_done_at(1)
-    assert_equal(true, @todos[1].done?)
-    @list.mark_undone_at(1)
-    assert_equal(false, @todos[1].done?)
-  end
-
-  def test_done_bang
+    assert_raises(IndexError) { @list.mark_undone_at(10) } 
     @todo1.done!
     @todo2.done!
     @todo3.done!
+    @list.mark_undone_at(1)
 
+    assert_equal(true, @todo1.done?)
+    assert_equal(false, @todo2.done?)
+    assert_equal(true, @todo3.done?)
+  end
+
+  def test_done!
+    @list.done!
+
+    assert_equal(true, @todo1.done?)
+    assert_equal(true, @todo2.done?)
+    assert_equal(true, @todo3.done?)
     assert_equal(true, @list.done?)
   end
 
   def test_remove_at
-    assert_raises(IndexError) { @list.remove_at(100) }
+    assert_raises(IndexError) { @list.remove_at(10) }
+    
     @list.remove_at(1)
-    assert_equal([@todo1, @todo3], @list.to_a)
+    assert_equal(2, @list.size)
+    assert_equal(@todo1, @list.first)
+    assert_equal(@todo3, @list.last)
   end
-
+  
   def test_to_s
-    output = <<~OUTPUT
+    output = <<~OUTPUT.chomp
     ---- Today's Todos ----
     [ ] Buy milk
     [ ] Clean room
     [ ] Go to gym
+    
     OUTPUT
-
+  
     assert_equal(output, @list.to_s)
   end
 
   def test_to_s_one_done
-    @list.mark_done_at(1)
-
-    output = <<~OUTPUT
+    output = <<~OUTPUT.chomp
     ---- Today's Todos ----
     [ ] Buy milk
     [X] Clean room
     [ ] Go to gym
+
     OUTPUT
 
+    @list.mark_done_at(1)
     assert_equal(output, @list.to_s)
   end
-  
-  def test_to_s_all_done
-    @list.done!
 
-    output = <<~OUTPUT
+  def test_to_s_all_done
+    output = <<~OUTPUT.chomp
     ---- Today's Todos ----
     [X] Buy milk
     [X] Clean room
     [X] Go to gym
+
     OUTPUT
 
+    @list.done!
     assert_equal(output, @list.to_s)
   end
 
   def test_each
-    @list.each { |to_do| to_do.done! }
-    assert_equal(true, @list.done?)
+    result = []
+    @list.each { |todo| result << todo }
+    assert_equal(@todos, result)
   end
 
   def test_each_return
-    assert_equal(@list, @list.each { nil })
+    result = @list.each { nil }
+    
+    assert_equal(@list, result)
   end
-
+  
   def test_select
     @todo1.done!
-    new_list = ToDoList.new(@list.title)
-    new_list.add(@todo1)
-
-    assert_equal(new_list.title, @list.title)
-    assert_equal(new_list.to_s, @list.select { |to_do| to_do.done? }.to_s)
+    list = ToDoList.new(@list.title)
+    list.add(@todo1)
+    
+    result = @list.select { |todo| todo.done? }
+    
+    assert_instance_of(ToDoList, result)
+    assert_equal(list.to_s, result.to_s)
   end
-
 end

@@ -4,8 +4,8 @@
 #   counter
 # end
 
-def count(arr)
-  arr.select { |el| yield(el) }.size
+def count(arr, &block)
+  arr.select(&block).size
 end
 
 p count([1,2,3,4,5]) { |value| value.odd? } == 3

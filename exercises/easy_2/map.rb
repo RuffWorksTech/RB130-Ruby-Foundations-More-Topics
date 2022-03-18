@@ -1,6 +1,7 @@
 def map(arr)
-  arr.each_with_object([]) { |el, result| result << yield(el) }
+  arr.each_with_object([]) { |el, new_arr|  new_arr << yield(el) }
 end
+
 
 p map([1, 3, 6]) { |value| value**2 } == [1, 9, 36]
 p map([]) { |value| true } == []

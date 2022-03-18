@@ -12,6 +12,7 @@ gather(items) do |*produce, wheat|
   puts wheat
 end
 
+
 # => Let's start gathering food.
 # => apples, corn, cabbage
 # => wheat
@@ -19,9 +20,9 @@ end
 #------------------------------------------------------------------------
 
 # 2)
-gather(items) do |apples, *veggies, wheat|
+gather(items) do |apples, *vegetables, wheat|
   puts apples
-  puts veggies.join(', ')
+  puts vegetables.join(', ')
   puts wheat
 end
 
@@ -33,9 +34,9 @@ end
 #------------------------------------------------------------------------
 
 # 3)
-gather(items) do |apples, *assorted|
+gather(items) do |apples, *produce|
   puts apples
-  puts assorted.join(', ')
+  puts produce.join(', ')
 end
 
 # => Let's start gathering food.
